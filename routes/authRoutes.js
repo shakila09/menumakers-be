@@ -1,6 +1,7 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 const { registerUser } = require('../controllers/authController');
+const { forgotPassword, resetPassword} = require('../controllers/passwordController');
 const router = express.Router();
 
 router.post(
@@ -22,5 +23,10 @@ router.post(
   ],
   registerUser
 );
+// Route for Forgot Password (requesting password reset link)
+router.post('/forgot-password', forgotPassword);
+
+// Route for resetting the password
+router.post('/reset-password/:token', resetPassword);
 
 module.exports = router;
