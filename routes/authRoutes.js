@@ -1,26 +1,50 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-const { registerUser } = require('../controllers/authController');
+const { registerUser, loginUser, forgotPassword, resetPassword } = require('../controllers/authController');
 const router = express.Router();
 
+// Registration Route
 router.post(
   '/register',
   [
-    // Validation for the name field to ensure it's not empty and contains only letters and spaces
-    check('name', 'Name is required')
-      .not()
-      .isEmpty()
-      .withMessage('Name cannot be empty')
-      .matches(/^[A-Za-z\s]+$/)
-      .withMessage('Name must contain only letters and spaces'),  // New validation to disallow numbers
-    // Validation for the email field
+    check('name', 'Name is required').not().isEmpty().matches(/^[A-Za-z\s]+$/).withMessage('Name must contain only letters and spaces'),
     check('email', 'Please include a valid email').isEmail(),
-    // Validation for the password field
-    check('password', 'Password must be at least 6 characters and contain a number')
-      .isLength({ min: 6 })
-      .matches(/\d/),
+    check('password', 'Password must be at least 8 characters long and contain an uppercase, lowercase, number, and special character')
+      .isLength({ min: 8 })
+      .matches(/[a-z]/)
+      .matches(/[A-Z]/)
+      .matches(/\d/)
+      .matches(/[\W_]/)
   ],
-  registerUser
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    registerUser(req, res);
+  }
 );
+
+// Login Route
+router.post(
+  '/login',
+  [
+    check('email', 'Please include a valid email').isEmail(),
+    check('password', 'Password is required').not().isEmpty(),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    loginUser(req, res);
+  }
+);
+
+// Forgot password route
+router.post('/forgot-password', forgotPassword);
+
+// Reset password route
+router.post('/reset-password/:token', resetPassword);
 
 module.exports = router;
