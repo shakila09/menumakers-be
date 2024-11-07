@@ -6,11 +6,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const app = express();
 
 // Load environment variables from .env file
 dotenv.config();
-
-const app = express();
 
 // Connect to MongoDB with proper logging
 mongoose.connect(process.env.MONGO_URI, {
@@ -24,31 +23,47 @@ mongoose.connect(process.env.MONGO_URI, {
   });
 
 // Middleware
-app.use(cors());
-// app.use(cors({
-//   origin: 'http://localhost:5173', // Replace with your frontend URL
-//   methods: ['GET', 'POST'],       // Specify allowed methods
-//   allowedHeaders: ['Content-Type'], // Specify allowed headers
-// }));
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend origin
+  credentials: true // Allow credentials to be sent with the request
+}));
+
 app.use(express.json());
+
+// Configure session middleware
 app.use(
   session({
     secret: process.env.SESSION_SECRET, 
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Avoid saving uninitialized sessions
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-    cookie: { maxAge: 3600000 }, // 1 hour
+    cookie: { 
+      maxAge: 3600000, // 1 hour
+      secure: false,    // Set to true if using HTTPS
+      httpOnly: true    // Ensures cookie is only accessible by the web server
+    }
   })
 );
 
-// Routes
-app.use('/api/auth', authRoutes); // path matches your route folder structure
-// Use the payment route
-app.use('/api/payment', paymentRoutes);
-// Start server
-const PORT = process.env.PORT || 5001 || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+// Define the /api/auth/session route
+app.get('/api/auth/session', (req, res) => {
+  console.log('Session data:', req.session); // Debugging: Check if session data exists
+  if (req.session && req.session.userId) {
+    res.json({ userId: req.session.userId });
+  } else {
+    res.status(401).json({ error: 'No active session' });
+  }
 });
 
 
+
+// Routes
+app.use('/api/auth', authRoutes); // path matches your route folder structure
+app.use('/api/payment', paymentRoutes); // Use the payment route
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
