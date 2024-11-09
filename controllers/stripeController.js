@@ -19,8 +19,8 @@ exports.createCheckoutSession = async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: 'http://localhost:5174/success',
-      cancel_url: 'http://localhost:5174/cancel',
+      success_url: 'http://localhost:5173/success',
+      cancel_url: 'http://localhost:5173/cancel',
     });
 
     res.json({ id: session.id });
