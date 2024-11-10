@@ -6,6 +6,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const purchaseRoutes = require('./routes/purchaseRoutes');
 const app = express();
 
 // Load environment variables from .env file
@@ -61,6 +62,8 @@ app.get('/api/auth/session', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes); // path matches your route folder structure
 app.use('/api/payment', paymentRoutes); // Use the payment route
+app.use('/api/purchases', purchaseRoutes); // Adds purchase routes
+
 
 // Start server
 const PORT = process.env.PORT || 5001;
