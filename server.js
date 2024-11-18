@@ -6,11 +6,18 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+<<<<<<< Updated upstream
 const purchaseRoutes = require('./routes/purchaseRoutes');
+=======
+const saveSvgRoute = require('./routes/saveSvgRoute');
+const templateRoutes = require('./routes/templateRoutes');
+
+>>>>>>> Stashed changes
 const app = express();
 
 // Load environment variables from .env file
-dotenv.config();
+require('dotenv').config();
+console.log('Environment Variables:', process.env);
 
 // Connect to MongoDB with proper logging
 mongoose.connect(process.env.MONGO_URI, {
@@ -62,8 +69,13 @@ app.get('/api/auth/session', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes); // path matches your route folder structure
 app.use('/api/payment', paymentRoutes); // Use the payment route
+<<<<<<< Updated upstream
 app.use('/api/purchases', purchaseRoutes); // Adds purchase routes
 
+=======
+app.use('/api', saveSvgRoute);
+app.use('/api/templates', templateRoutes);
+>>>>>>> Stashed changes
 
 // Start server
 const PORT = process.env.PORT || 5001;
