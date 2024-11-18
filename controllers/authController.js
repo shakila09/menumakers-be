@@ -32,12 +32,17 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ msg: 'Invalid email or password' });
     }
     req.session.userId = user._id; // Store the session
-    res.status(200).json({ msg: 'Login successful' });
-  } catch (err) {
-    res.status(500).send('Server error');
-  }
-};
-
+       // Include userId in the response
+       res.status(200).json({
+        msg: 'Login successful',
+        userId: user._id,
+      });
+    } catch (err) {
+      console.error('Login error:', err);
+      res.status(500).send('Server error');
+    }
+  };
+  
 // Forgot Password
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
