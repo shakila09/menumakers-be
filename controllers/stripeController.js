@@ -43,6 +43,11 @@ exports.savePurchase = async (req, res) => {
 }
 
   try {
+     // Check if the purchase already exists
+    const existingPurchase = await Purchase.findOne({ templateName, userEmail });
+    if (existingPurchase) {
+      return res.status(200).json({ message: 'Purchase already saved' });
+    }
     // Save the purchase details in the database
     const purchase = new Purchase({
       templateName,
