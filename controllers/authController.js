@@ -24,6 +24,7 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
+    console.log(user)
     if (!user) {
       return res.status(400).json({ msg: 'Invalid email or password' });
     }
@@ -32,7 +33,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ msg: 'Invalid email or password' });
     }
     req.session.userId = user._id; // Store the session
-    res.status(200).json({ msg: 'Login successful' });
+    res.status(200).json({ msg: 'Login successful', name: user.name, email: user.email });
   } catch (err) {
     res.status(500).send('Server error');
   }
