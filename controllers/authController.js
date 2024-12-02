@@ -24,23 +24,29 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ msg: 'Invalid email or password' });
+    if (!user) 
+      {
+      return res.status(400).json({errors: [{ param: 'email', msg: 'No account found with this email' }],
+      }); 
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid email or password' });
+      return res.status(400).json({errors: [{ param: 'password', msg: 'Incorrect password' }], });
     }
     req.session.userId = user._id; // Store the session
+    req.session.userName = user.name; // Store the session
+
        // Include userId in the response
        res.status(200).json({
         msg: 'Login successful',
         userId: user._id,
+        userName: user.name,
       });
     } catch (err) {
       console.error('Login error:', err);
-      res.status(500).send('Server error');
-    }
+      return res.status(500).json({
+        errors: [{ msg: 'Something went wrong. Please try again later.' }],
+      });    }
   };
   
 // Forgot Password
